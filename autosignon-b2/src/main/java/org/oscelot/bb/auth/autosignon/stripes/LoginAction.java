@@ -190,6 +190,16 @@ public class LoginAction implements ActionBean {
     sessionManager.attachUserToSession(user, ap, session, "Logged in from Autosignon." ,context.getRequest());
     addDebugMessage("User <b>"+userId+"</b> Authenticated Successfully.");
 
+    if (forward != null && !forward.trim().isEmpty()) {
+        logger.debug("Forwarding to custom `forward` location. courseId parameter is ignored.");
+        String forwardLauncherUrl = "/webapps/portal/frameset.jsp?url=" + forward;
+        addDebugMessage("`forward` parameter is provided, `courseId` is ignored. Accessibility of the location by User is not checked. Would redirect to <a href='"+forwardLauncherUrl+"'>"+forwardLauncherUrl+"</a>.");
+        if (debugMode) {
+          return new ForwardResolution(DEBUG_PAGE);
+        }
+        return new RedirectResolution(forwardLauncherUrl, false);
+    }
+
     if (courseId == null || courseId.trim().isEmpty()) {
       addDebugMessage("No courseId provided. Would redirect to Homepage.");
       logger.info("No courseId provided. Redirecting to Homepage.");
@@ -225,7 +235,7 @@ public class LoginAction implements ActionBean {
 
     logger.debug("Redirecting to Course.");
     String courseLauncherUrl = "/webapps/portal/frameset.jsp?url=%2Fwebapps%2Fblackboard%2Fexecute%2Flauncher%3Ftype%3DCourse%26id%3D";
-    addDebugMessage("User can access course. Would redirect to course at <a href='"+courseLauncherUrl+"'>"+courseLauncherUrl+"</a>.");
+    addDebugMessage("User can access course. Would redirect to course at <a href='"+courseLauncherUrl+course.getId().toExternalString()+"'>"+courseLauncherUrl+ course.getId().toExternalString()+"</a>.");
     if (debugMode) {
       return new ForwardResolution(DEBUG_PAGE);
     }
